@@ -5,13 +5,12 @@ provider "aws" {
 data "aws_availability_zones" "available" {}
 
 resource "aws_vpc" "vpc" {
-  cidr_block = var.network_cidr_block
+  cidr_block           = var.network_cidr_block
   enable_dns_hostnames = "true"
   tags = {
     Name = "VPC-${var.business_unit}"
   }
 }
-
 
 resource "aws_subnet" "public_subnet" {
   cidr_block        = var.public_cidr_block
@@ -66,6 +65,7 @@ resource "aws_instance" "linux" {
   count         = var.instance_count
   ami           = data.aws_ami.linux.id
   instance_type = var.instance_type
+  vpc_security_group_ids = [aws_security_group.sg-http.id]
   subnet_id     = aws_subnet.public_subnet.id
   user_data     = <<-EOF
                   #!/bin/bash
@@ -80,20 +80,15 @@ resource "aws_instance" "linux" {
   }
 }
 
-
 resource "aws_security_group" "sg_web_server" {
   name   = "sg_elb"
   vpc_id = aws_vpc.vpc.id
-
-  #Allow HTTP from anywhere
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  #allow all outbound
   egress {
     from_port   = 0
     to_port     = 0
@@ -106,7 +101,7 @@ resource "aws_elb" "lb_web_server" {
 
   subnets         = [aws_subnet.public_subnet.id]
   security_groups = [aws_security_group.sg_web_server.id]
-  instances       = "${aws_instance.linux.*.id}"
+  instances       = aws_instance.linux.*.id
 
   listener {
     instance_port     = 80
