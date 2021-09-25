@@ -6,7 +6,7 @@ data "aws_availability_zones" "available" {}
 
 resource "aws_vpc" "vpc" {
   cidr_block           = var.network_cidr_block
-  enable_dns_hostnames = "true"
+  enable_dns_hostnames = true
   tags = {
     Name = "VPC-${var.business_unit}"
   }
@@ -61,7 +61,7 @@ data "aws_ami" "linux" {
   owners = ["amazon"]
 }
 
-resource "aws_security_group" "sg-http" {
+resource "aws_security_group" "sg_http" {
   name   = "sg_http"
   vpc_id = aws_vpc.vpc.id
   ingress {
@@ -82,7 +82,7 @@ resource "aws_instance" "linux" {
   count         = var.instance_count
   ami           = data.aws_ami.linux.id
   instance_type = var.instance_type
-  vpc_security_group_ids = [aws_security_group.sg-http.id]
+  vpc_security_group_ids = [aws_security_group.sg_http.id]
   subnet_id     = aws_subnet.public_subnet.id
   associate_public_ip_address = true
   user_data     = <<-EOF
