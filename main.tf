@@ -4,7 +4,7 @@ provider "aws" {
 
 data "aws_availability_zones" "available" {}
 
-resource "aws_vpc" "private_vpc" {
+resource "aws_vpc" "vpc" {
   cidr_block = var.private_cidr_block
   tags = {
     Name = "VPC-PRIVATE-${var.business_unit}"
@@ -13,30 +13,31 @@ resource "aws_vpc" "private_vpc" {
 
 resource "aws_subnet" "private_subnet" {
   cidr_block        = var.private_cidr_block
-  vpc_id            = aws_vpc.private_vpc.id
+  vpc_id            = aws_vpc.vpc.id
   availability_zone = data.aws_availability_zones.available.names[0]
 }
 
 resource "aws_vpc" "public_vpc" {
   cidr_block = var.public_cidr_block
+  enable_dns_hostnames = "true"
   tags = {
-    Name = "VPC-PRIVATE-${var.business_unit}"
+    Name = "VPC-PUBLIC-${var.business_unit}"
   }
 }
 
 resource "aws_subnet" "public_subnet" {
   cidr_block        = var.public_cidr_block
-  vpc_id            = aws_vpc.public_vpc.id
+  vpc_id            = aws_vpc.vpc.id
   availability_zone = data.aws_availability_zones.available.names[0]
 }
 
 resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.public_vpc.id
+  vpc_id = aws_vpc.vpc.id
 
 }
 
 resource "aws_route_table" "igw_route" {
-  vpc_id = aws_vpc.public_vpc.id
+  vpc_id = aws_vpc.vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
