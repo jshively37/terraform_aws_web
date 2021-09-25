@@ -14,6 +14,10 @@ variable "instance_count" {
   description = "Number of EC2 instances to build"
 }
 
-variable "cidr_block" {
-  description = "CIDR Block"
+variable "public_cidr_block" {
+  description = "Public CIDR Block"
+}
+
+variable "private_cidr_block" {
+  description = "Private CIDR Block"
 }

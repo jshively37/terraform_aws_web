@@ -4,6 +4,32 @@ provider "aws" {
 
 data "aws_availability_zones" "available" {}
 
+resource "aws_vpc" "private_vpc" {
+  cidr_block = var.private_cidr_block
+  tags = {
+    Name = "VPC-PRIVATE-${var.business_unit}"
+  }
+}
+
+resource "aws_subnet" "private_subnet" {
+  cidr_block        = var.private_cidr_block
+  vpc_id            = aws_vpc.private_vpc.id
+  availability_zone = data.aws_availability_zones.available.names[0]
+}
+
+resource "aws_vpc" "public_vpc" {
+  cidr_block = var.public_cidr_block
+  tags = {
+    Name = "VPC-PRIVATE-${var.business_unit}"
+  }
+}
+
+resource "aws_subnet" "public_subnet" {
+  cidr_block        = var.public_cidr_block
+  vpc_id            = aws_vpc.public_vpc.id
+  availability_zone = data.aws_availability_zones.available.names[0]
+}
+
 data "aws_ami" "linux" {
   most_recent = true
 
@@ -31,15 +57,44 @@ resource "aws_instance" "linux" {
   }
 }
 
-resource "aws_vpc" "private_vpc" {
-  cidr_block = var.cidr_block
+
+resource "aws_security_group" "sg_web_server" {
+  name   = "sg_elb"
+  vpc_id = aws_vpc.public_vpc.id
+
+  #Allow HTTP from anywhere
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  #allow all outbound
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+resource "aws_elb" "lb_web_server" {
+  name = "lb-web"
+
+  subnets         = [var.public_cidr_block, var.private_cidr_block]
+  security_groups = [aws_security_group.sg_web_server.id]
+  instances       = "${aws_instance.linux.*.id}"
+
+  listener {
+    instance_port     = 80
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+  }
+
   tags = {
-    Name = "VPC-PRIVATE-${var.business_unit}"
+    Name = "LB-HTTP-${var.business_unit}"
   }
 }
 
-resource "aws_subnet" "private_subnet" {
-  cidr_block        = var.cidr_block
-  vpc_id            = aws_vpc.private_vpc.id
-  availability_zone = data.aws_availability_zones.available.names[0]
-}
+
