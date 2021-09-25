@@ -10,7 +10,7 @@ variable "business_unit" {
   description = "Business unit for the EC2 instance"
 }
 
-variable "instance_count_public" {
+variable "instance_count" {
   description = "Number of EC2 instances to build"
 }
 

@@ -21,7 +21,7 @@ data "aws_ami" "linux" {
 }
 
 resource "aws_instance" "linux" {
-  count         = var.instance_count_public
+  count         = var.instance_count
   ami           = data.aws_ami.linux.id
   instance_type = var.instance_type
   subnet_id     = aws_subnet.subnet.id
