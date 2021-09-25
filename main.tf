@@ -25,6 +25,7 @@ resource "aws_instance" "linux" {
   ami           = data.aws_ami.linux.id
   instance_type = var.instance_type
   # subnet_id     = aws_subnet.subnet.id
+  vpc_security_group_ids = [aws_security_group.security_group.id]
 
   user_data     = <<-EOF
                   #!/bin/bash
@@ -85,14 +86,12 @@ resource "aws_security_group" "security_group" {
     to_port          = 80
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
   }
   egress {
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
     cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
   }
 
   tags = {
