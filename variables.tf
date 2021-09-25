@@ -21,7 +21,3 @@ variable "network_cidr_block" {
 variable "public_cidr_block" {
   description = "Public CIDR Block"
 }
-
-variable "private_cidr_block" {
-  description = "Private CIDR Block"
-}
