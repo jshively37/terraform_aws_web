@@ -5,7 +5,7 @@ provider "aws" {
 data "aws_availability_zones" "available" {}
 
 resource "aws_vpc" "vpc" {
-  cidr_block = var.private_cidr_block
+  cidr_block = var.network_cidr_block
   enable_dns_hostnames = "true"
   tags = {
     Name = "VPC-${var.business_unit}"
