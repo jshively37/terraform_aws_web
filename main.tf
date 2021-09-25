@@ -17,11 +17,16 @@ resource "aws_subnet" "public_subnet" {
   cidr_block        = var.public_cidr_block
   vpc_id            = aws_vpc.vpc.id
   availability_zone = data.aws_availability_zones.available.names[0]
+  tags = {
+    "Name" = "SUBNET-${var.business_unit}"
+  }
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
-
+  tags = {
+    "Name" = "IGW-${var.business_unit}"
+  }
 }
 
 resource "aws_route_table" "route_igw" {
@@ -30,6 +35,9 @@ resource "aws_route_table" "route_igw" {
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.igw.id
+  }
+  tags = {
+    "Name" = "ROUTE-${var.business_unit}"
   }
 }
 
@@ -105,4 +113,31 @@ resource "aws_elb" "lb_web_server" {
   }
 }
 
+resource "aws_security_group" "sg-http" {
+  name   = "sg_http"
+  vpc_id = aws_vpc.vpc.id
 
+  # SSH access from anywhere
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # HTTP access from the VPC
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.network_cidr_block]
+  }
+
+  # outbound internet access
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
