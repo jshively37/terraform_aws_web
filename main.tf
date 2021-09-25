@@ -24,7 +24,16 @@ resource "aws_instance" "linux" {
   count         = var.instance_count
   ami           = data.aws_ami.linux.id
   instance_type = var.instance_type
-  subnet_id     = aws_subnet.subnet.id
+  # subnet_id     = aws_subnet.subnet.id
+
+  user_data     = <<-EOF
+                  #!/bin/bash
+                  sudo su
+                  yum -y install httpd
+                  echo "<p> My Instance! </p>" >> /var/www/html/index.html
+                  sudo systemctl enable httpd
+                  sudo systemctl start httpd
+                  EOF
 
   tags = {
     Name = "EC2-${var.business_unit}-${count.index + 1}"
