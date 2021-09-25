@@ -2,6 +2,8 @@ provider "aws" {
   region = var.region
 }
 
+data "aws_availability_zones" "available" {}
+
 data "aws_ami" "linux" {
   most_recent = true
 
@@ -22,16 +24,22 @@ resource "aws_instance" "linux" {
   count         = var.instance_count_public
   ami           = data.aws_ami.linux.id
   instance_type = var.instance_type
-  subnet_id = aws_vpc.aws_vpc.id
+  subnet_id     = aws_subnet.subnet.id
 
   tags = {
     Name = "EC2-${var.business_unit}-${count.index + 1}"
   }
 }
 
-resource "aws_vpc" "aws_vpc" {
+resource "aws_vpc" "vpc" {
   cidr_block = var.cidr_block
   tags = {
     Name = "VPC-${var.business_unit}"
   }
+}
+
+resource "aws_subnet" "subnet" {
+  cidr_block        = var.cidr_block
+  vpc_id            = aws_vpc.vpc.id
+  availability_zone = data.aws_availability_zones.available.names[0]
 }
