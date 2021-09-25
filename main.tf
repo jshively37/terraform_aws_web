@@ -81,7 +81,7 @@ resource "aws_security_group" "sg_web_server" {
 resource "aws_elb" "lb_web_server" {
   name = "lb-web"
 
-  subnets         = [var.public_cidr_block, var.private_cidr_block]
+  subnets         = [aws_subnet.public_subnet.id, aws_subnet.private_subnet.id]
   security_groups = [aws_security_group.sg_web_server.id]
   instances       = "${aws_instance.linux.*.id}"
 
