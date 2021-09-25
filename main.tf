@@ -89,7 +89,7 @@ resource "aws_instance" "linux" {
                   #!/bin/bash
                   sudo su
                   yum -y install httpd
-                  echo "<h2> Insert blog here </h2>" >> /var/www/html/index.html
+                  echo "<h2> Running on ${var.business_unit}-${count.index + 1}</h2>" >> /var/www/html/index.html
                   sudo systemctl enable httpd
                   sudo systemctl start httpd
                   EOF
