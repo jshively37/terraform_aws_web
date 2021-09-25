@@ -67,7 +67,14 @@ resource "aws_instance" "linux" {
   ami           = data.aws_ami.linux.id
   instance_type = var.instance_type
   subnet_id     = aws_subnet.public_subnet.id
-
+  user_data     = <<-EOF
+                  #!/bin/bash
+                  sudo su
+                  yum -y install httpd
+                  echo "<h2> Insert blog here </h2>" >> /var/www/html/index.html
+                  sudo systemctl enable httpd
+                  sudo systemctl start httpd
+                  EOF
   tags = {
     Name = "EC2-${var.business_unit}-${count.index + 1}"
   }
@@ -116,24 +123,12 @@ resource "aws_elb" "lb_web_server" {
 resource "aws_security_group" "sg-http" {
   name   = "sg_http"
   vpc_id = aws_vpc.vpc.id
-
-  # SSH access from anywhere
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # HTTP access from the VPC
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = [var.network_cidr_block]
   }
-
-  # outbound internet access
   egress {
     from_port   = 0
     to_port     = 0
