@@ -79,13 +79,13 @@ resource "aws_security_group" "sg_http" {
 }
 
 resource "aws_instance" "linux" {
-  count         = var.instance_count
-  ami           = data.aws_ami.linux.id
-  instance_type = var.instance_type
-  vpc_security_group_ids = [aws_security_group.sg_http.id]
-  subnet_id     = aws_subnet.public_subnet.id
+  count                       = var.instance_count
+  ami                         = data.aws_ami.linux.id
+  instance_type               = var.instance_type
+  vpc_security_group_ids      = [aws_security_group.sg_http.id]
+  subnet_id                   = aws_subnet.public_subnet.id
   associate_public_ip_address = true
-  user_data     = <<-EOF
+  user_data                   = <<-EOF
                   #!/bin/bash
                   sudo su
                   yum -y install httpd
