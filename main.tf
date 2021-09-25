@@ -24,6 +24,6 @@ resource "aws_instance" "linux" {
   instance_type = var.instance_type
 
   tags = {
-    Name = "Terraform-${count.index + 1}"
+    Name = "${var.instance_name}-${count.index + 1}"
   }
 }
