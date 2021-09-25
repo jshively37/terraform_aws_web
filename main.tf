@@ -61,12 +61,30 @@ data "aws_ami" "linux" {
   owners = ["amazon"]
 }
 
+resource "aws_security_group" "sg-http" {
+  name   = "sg_http"
+  vpc_id = aws_vpc.vpc.id
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.network_cidr_block]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_instance" "linux" {
   count         = var.instance_count
   ami           = data.aws_ami.linux.id
   instance_type = var.instance_type
   vpc_security_group_ids = [aws_security_group.sg-http.id]
   subnet_id     = aws_subnet.public_subnet.id
+  associate_public_ip_address = true
   user_data     = <<-EOF
                   #!/bin/bash
                   sudo su
@@ -112,22 +130,5 @@ resource "aws_elb" "lb_web_server" {
 
   tags = {
     Name = "LB-HTTP-${var.business_unit}"
-  }
-}
-
-resource "aws_security_group" "sg-http" {
-  name   = "sg_http"
-  vpc_id = aws_vpc.vpc.id
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [var.network_cidr_block]
-  }
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 }
