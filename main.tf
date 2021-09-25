@@ -8,15 +8,10 @@ resource "aws_vpc" "vpc" {
   cidr_block = var.private_cidr_block
   enable_dns_hostnames = "true"
   tags = {
-    Name = "VPC-PRIVATE-${var.business_unit}"
+    Name = "VPC-${var.business_unit}"
   }
 }
 
-# resource "aws_subnet" "private_subnet" {
-#   cidr_block        = var.private_cidr_block
-#   vpc_id            = aws_vpc.vpc.id
-#   availability_zone = data.aws_availability_zones.available.names[0]
-# }
 
 resource "aws_subnet" "public_subnet" {
   cidr_block        = var.public_cidr_block
