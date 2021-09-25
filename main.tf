@@ -22,8 +22,16 @@ resource "aws_instance" "linux" {
   count         = var.instance_count_public
   ami           = data.aws_ami.linux.id
   instance_type = var.instance_type
+  subnet_id = aws_vpc.aws_vpc.id
 
   tags = {
-    Name = "${var.business_unit}-${count.index + 1}"
+    Name = "EC2-${var.business_unit}-${count.index + 1}"
+  }
+}
+
+resource "aws_vpc" "aws_vpc" {
+  cidr_block = var.cidr_block
+  tags = {
+    Name = "VPC-${var.business_unit}"
   }
 }

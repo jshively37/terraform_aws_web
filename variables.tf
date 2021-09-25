@@ -13,3 +13,7 @@ variable "business_unit" {
 variable "instance_count_public" {
   description = "Number of EC2 instances to build"
 }
+
+variable "cidr_block" {
+  description = "CIDR Block"
+}
