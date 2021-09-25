@@ -6,8 +6,8 @@ variable "instance_type" {
   description = "Type of EC2 instance to provision"
 }
 
-variable "instance_name" {
-  description = "EC2 instance name"
+variable "business_unit" {
+  description = "Business unit for the EC2 instance"
 }
 
 variable "instance_count_public" {
