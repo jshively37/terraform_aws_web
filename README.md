@@ -1,5 +1,7 @@
 This will deploy servers and an elb
 
+Working on making this more scalable with auto scaling.
+
 
 variables:
 region
