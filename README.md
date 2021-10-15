@@ -10,3 +10,5 @@ business_unit
 instance_count
 network_cidr_block
 public_cidr_block
+asg_min
+asg_max
