@@ -21,3 +21,12 @@ variable "network_cidr_block" {
 variable "public_cidr_block" {
   description = "Public CIDR Block"
 }
+
+variable "asg_min" {
+  description = "Auto scaling group min"
+
+}
+
+variable "asg_max" {
+  description = "Auto scaling group max"
+}
